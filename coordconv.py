@@ -1,3 +1,5 @@
+# The code is adopted from https://github.com/walsvid/CoordConv
+
 import torch.nn.modules.conv as conv
 import torch.nn as nn
 import torch
