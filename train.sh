@@ -1,1 +1,1 @@
-python train.py --experiment vit
+python train.py --experiment fnet

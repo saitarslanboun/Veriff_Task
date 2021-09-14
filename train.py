@@ -65,7 +65,7 @@ def train(epoch):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|vit|")
+	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|vit|fnet|")
 	opt = parser.parse_args()
 
 	# If the machine has GPU, use CUDA accelerator for the computations
@@ -78,6 +78,8 @@ if __name__ == "__main__":
 		from coordconv_network import Net
 	elif opt.experiment == 'vit':
 		from vit_network import Net
+	elif opt.experiment == 'fnet':
+		from fnet_network import Net
 	model = Net().to(device)
 
 	# Define maximum number of training epochs
