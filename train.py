@@ -1,18 +1,11 @@
 # The training code is adopted from https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
 
 from torchvision import datasets, transforms
-from network import Net
 
 import torch
-torch.manual_seed(0)
-torch.use_deterministic_algorithms(True)
-import random
-random.seed(0)
-import numpy
-numpy.random.seed(0)
-
 import torch.optim as optim
 import torch.nn.functional as F
+import argparse
 
 def validate():
 
@@ -71,17 +64,24 @@ def train(epoch):
 				100. * batch_idx / len(train_loader), loss.item()))
 
 if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|")
+	opt = parser.parse_args()
 
 	# If the machine has GPU, use CUDA accelerator for the computations
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 	# Loading the model
+	if opt.experiment == 'baseline':
+		from baseline_network import Net
+	elif opt.experiment == 'coordconv':
+		from coordconv_network import Net
 	model = Net().to(device)
 
 	# Define maximum number of training epochs
 	max_num_epochs = 300
 
-	# Define the maximum number of training epochs that the model will not demonstrate minimum validation loss
+	# Define the maximum number of training epochs for the early stopping
 	tolerance_epochs = 3
 
 	# Training dataset
@@ -116,5 +116,6 @@ if __name__ == "__main__":
 			break
 
 	print ("Saving the model...")
-	torch.save(state_dict, "spatial_transformer_network.pt")
+	model_name = opt.experiment + "_network.pt"
+	torch.save(state_dict, model_name)
 	print ("Model is saved.")
