@@ -1,1 +1,1 @@
-python train.py --experiment baseline
+python train.py --experiment vit
