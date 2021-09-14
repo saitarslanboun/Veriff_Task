@@ -74,7 +74,7 @@ def train(epoch):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|vit|fnet|focus|")
+	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|vit|fnet|focus|focuspsilu|")
 	opt = parser.parse_args()
 
 	logging.basicConfig(filename=opt.experiment+"_out.log", filemode="w")
@@ -95,10 +95,9 @@ if __name__ == "__main__":
 		from fnet_network import Net
 	elif opt.experiment == 'focus':
 		from focus_network import Net
+	elif opt.experiment == 'focuspsilu':
+		from focus_silu_network import Net
 	model = Net().to(device)
-	pytorch_total_params = sum(p.numel() for p in model.parameters())
-	print (pytorch_total_params)
-	exit()
 
 	# Define maximum number of training epochs
 	max_num_epochs = 1000

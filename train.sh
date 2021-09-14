@@ -1,1 +1,1 @@
-python train.py --experiment coordconv
+python train.py --experiment focus
