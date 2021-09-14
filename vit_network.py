@@ -10,7 +10,7 @@ class MultiHeadAttention(nn.Module):
 		self.q = nn.Linear(c, c, bias=False)
 		self.k = nn.Linear(c, c, bias=False)
 		self.v = nn.Linear(c, c, bias=False)
-		self.ma = nn.MultiheadAttention(embed_dim=c, num_heads=1)
+		self.ma = nn.MultiheadAttention(embed_dim=c, num_heads=2)
 
 	def forward(self, x):
 		x = x.view(x.shape[0], x.shape[1], -1).transpose(1, 2)

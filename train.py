@@ -3,9 +3,18 @@
 from torchvision import datasets, transforms
 
 import torch
+torch.manual_seed(0)
+
+import random
+random.seed(0)
+
+import numpy
+numpy.random.seed(0)
+
 import torch.optim as optim
 import torch.nn.functional as F
 import argparse
+import logging
 
 def validate():
 
@@ -30,7 +39,7 @@ def validate():
 		valid_loss /= len(valid_loader.dataset)
 
 		# Logging
-		print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(valid_loss, correct, len(valid_loader.dataset),
+		logger.info('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(valid_loss, correct, len(valid_loader.dataset),
 			100. * correct / len(valid_loader.dataset)))
 
 	return valid_loss
@@ -60,13 +69,17 @@ def train(epoch):
 
 		# Periodical logging
 		if batch_idx % 500 == 0:
-			print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(epoch, batch_idx * len(data), len(train_loader.dataset),
+			logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(epoch, batch_idx * len(data), len(train_loader.dataset),
 				100. * batch_idx / len(train_loader), loss.item()))
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|vit|fnet|")
+	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|vit|fnet|focus|")
 	opt = parser.parse_args()
+
+	logging.basicConfig(filename=opt.experiment+"_out.log", filemode="w")
+	logger = logging.getLogger()
+	logger.setLevel(logging.DEBUG)
 
 	# If the machine has GPU, use CUDA accelerator for the computations
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -80,13 +93,18 @@ if __name__ == "__main__":
 		from vit_network import Net
 	elif opt.experiment == 'fnet':
 		from fnet_network import Net
+	elif opt.experiment == 'focus':
+		from focus_network import Net
 	model = Net().to(device)
+	pytorch_total_params = sum(p.numel() for p in model.parameters())
+	print (pytorch_total_params)
+	exit()
 
 	# Define maximum number of training epochs
-	max_num_epochs = 300
+	max_num_epochs = 1000
 
 	# Define the maximum number of training epochs for the early stopping
-	tolerance_epochs = 3
+	tolerance_epochs = 20
 
 	# Training dataset
 	train_loader = torch.utils.data.DataLoader(datasets.MNIST(root='.', train=True, download=True, transform=transforms.Compose([transforms.ToTensor(),
@@ -116,10 +134,10 @@ if __name__ == "__main__":
 			tolerance += 1
 
 		if tolerance == tolerance_epochs:
-			print ("The model has reached convergence. Training is being stopped.")
+			logger.info("The model has reached convergence. Training is being stopped.")
 			break
 
-	print ("Saving the model...")
+	logger.info("Saving the model...")
 	model_name = opt.experiment + "_network.pt"
 	torch.save(state_dict, model_name)
-	print ("Model is saved.")
+	logger.info("Model is saved.")

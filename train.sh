@@ -1,1 +1,1 @@
-python train.py --experiment fnet
+python train.py --experiment coordconv
