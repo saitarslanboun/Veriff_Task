@@ -1,1 +1,1 @@
-python train.py --experiment focus
+python train.py --exp_setting vit

@@ -1,6 +1,7 @@
 # The training code is adopted from https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
 
 from torchvision import datasets, transforms
+from network import Net
 
 import torch
 torch.manual_seed(0)
@@ -74,10 +75,13 @@ def train(epoch):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--experiment", type=str, default="baseline", help="choose experiment type between |baseline|coordconv|vit|fnet|focus|focuspsilu|")
+	parser.add_argument("--exp_setting", type=str, default="baseline", help=""
+		"'baseline': baseline spatial transformer network"
+		"'coordconv': use coordconv instead of conv"
+		"'vit': baseline spinalnet")
 	opt = parser.parse_args()
 
-	logging.basicConfig(filename=opt.experiment+"_out.log", filemode="w")
+	logging.basicConfig(filename=opt.exp_setting+"_out.log", filemode="w")
 	logger = logging.getLogger()
 	logger.setLevel(logging.DEBUG)
 
@@ -85,25 +89,17 @@ if __name__ == "__main__":
 	device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 	# Loading the model
-	if opt.experiment == 'baseline':
+	if opt.exp_setting == "baseline":
 		from baseline_network import Net
-	elif opt.experiment == 'coordconv':
+	elif opt.exp_setting == "coordconv":
 		from coordconv_network import Net
-	elif opt.experiment == 'vit':
+	elif opt.exp_setting == "vit":
 		from vit_network import Net
-	elif opt.experiment == 'fnet':
-		from fnet_network import Net
-	elif opt.experiment == 'focus':
-		from focus_network import Net
-	elif opt.experiment == 'focuspsilu':
-		from focus_silu_network import Net
-	model = Net().to(device)
+	model = Net().to(device)	
+	
 
 	# Define maximum number of training epochs
-	max_num_epochs = 1000
-
-	# Define the maximum number of training epochs for the early stopping
-	tolerance_epochs = 20
+	num_epochs = 300
 
 	# Training dataset
 	train_loader = torch.utils.data.DataLoader(datasets.MNIST(root='.', train=True, download=True, transform=transforms.Compose([transforms.ToTensor(),
@@ -120,23 +116,15 @@ if __name__ == "__main__":
 	valid_losses = []
 
 	# Start training
-	for epoch in range(max_num_epochs):
+	for epoch in range(num_epochs):
 		train(epoch)
 		valid_loss = validate()
 		valid_losses.append(valid_loss)
 
-		# If there is no drop on the validation loss for x epochs, stop training in order to prevent overfitting
 		if valid_loss == min(valid_losses):
-			tolerance = 0
 			state_dict = model.state_dict()
-		else:
-			tolerance += 1
-
-		if tolerance == tolerance_epochs:
-			logger.info("The model has reached convergence. Training is being stopped.")
-			break
 
 	logger.info("Saving the model...")
-	model_name = opt.experiment + "_network.pt"
+	model_name = opt.exp_setting + "_network.pt"
 	torch.save(state_dict, model_name)
 	logger.info("Model is saved.")
