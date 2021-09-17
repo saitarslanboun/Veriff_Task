@@ -94,10 +94,7 @@ if __name__ == "__main__":
 		from coordconv_network import Net
 	elif opt.exp_setting == "vit":
 		from vit_network import Net
-	model = Net().to(device)	
-	pytorch_total_params = sum(p.numel() for p in model.parameters())
-	print (pytorch_total_params)
-	exit()
+	model = Net().to(device)
 	
 
 	# Define maximum number of training epochs
