@@ -1,4 +1,5 @@
-# The code is adopted from https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
+# The STN Net code is adopted from https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
+# CoordConv code is adopted from https://github.com/walsvid/CoordConv
 
 import torch.nn as nn
 import torch

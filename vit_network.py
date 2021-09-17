@@ -1,4 +1,5 @@
 # The Spatial Transformer Network (STN) code is adopted from https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
+# MultiHead Attention code is adopted from https://github.com/ultralytics/yolov5/blob/master/models/common.py
 
 import torch.nn as nn
 import torch
