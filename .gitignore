@@ -1,6 +1,4 @@
 __pycache__/
 MNIST/
-*.pt
-logs/
 *.log
 *.tst

@@ -1,7 +1,6 @@
 # The training code is adopted from https://pytorch.org/tutorials/intermediate/spatial_transformer_tutorial.html
 
 from torchvision import datasets, transforms
-from network import Net
 
 import torch
 torch.manual_seed(0)
@@ -96,6 +95,9 @@ if __name__ == "__main__":
 	elif opt.exp_setting == "vit":
 		from vit_network import Net
 	model = Net().to(device)	
+	pytorch_total_params = sum(p.numel() for p in model.parameters())
+	print (pytorch_total_params)
+	exit()
 	
 
 	# Define maximum number of training epochs
@@ -122,9 +124,8 @@ if __name__ == "__main__":
 		valid_losses.append(valid_loss)
 
 		if valid_loss == min(valid_losses):
-			state_dict = model.state_dict()
+			logger.info("Found a new best model. Saving...")
+			model_name = opt.exp_setting + "_network.pt"
+			torch.save(model.state_dict(), model_name)
+			logger.info("Model is saved.\n")
 
-	logger.info("Saving the model...")
-	model_name = opt.exp_setting + "_network.pt"
-	torch.save(state_dict, model_name)
-	logger.info("Model is saved.")

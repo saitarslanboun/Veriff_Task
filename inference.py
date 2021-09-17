@@ -8,6 +8,7 @@ def infer():
 	predictions = []
 	groundtruth = []
 	with torch.no_grad():
+		model.eval()
 		for data, target in infer_loader:
 			data, target = data.to(device), target.to(device)
 			output = model(data)
@@ -38,7 +39,7 @@ if __name__ == "__main__":
 
 	# Inference dataset
 	infer_loader = torch.utils.data.DataLoader(datasets.MNIST(root='.', train=False, transform=transforms.Compose([transforms.ToTensor(),
-		transforms.Normalize((0.1307,), (0.3081,))])), batch_size=64, shuffle=True, num_workers=4)
+		transforms.Normalize((0.1307,), (0.3081,))])), batch_size=64, shuffle=False, num_workers=4)
 
 	# Load model from the given checkpoint
 	model_fname = opt.chkpt.replace(".pt", "")
